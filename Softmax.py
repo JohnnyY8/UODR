@@ -500,15 +500,15 @@ def train_CNN(num_sample, num_batch, sample_id, x_data, dna_id, y_label, k_test_
   def bias_variable(shape):
     initial = tf.constant(0.1, shape=shape)
     return tf.Variable(initial)
-  
+
   def conv2d(x, W):
     # Given an input tensor of shape `[batch, in_height, in_width, in_channels]` and a filter / kernel tensor of shape
     return tf.nn.conv2d(x, W, strides=[1, 1, 1, 1], padding='SAME')
-  
+
   def max_pool_1x4(x):
     # strides: A list of ints that has length >= 4.  The stride of the sliding window for each dimension of the input tensor.
     return tf.nn.max_pool(x, ksize=[1, 1, 4, 1], strides=[1, 1, 4, 1], padding='SAME')
-  
+
   with tf.device('/gpu:0'):
     # The first two dimensions are the patch size, the next is the number of input channels, and the last is the number of output channels.
     x = tf.placeholder(tf.float32, [None, 978])
@@ -517,20 +517,20 @@ def train_CNN(num_sample, num_batch, sample_id, x_data, dna_id, y_label, k_test_
     b_conv1 = bias_variable([32])
     h_conv1 = tf.nn.relu(conv2d(x_input, W_conv1) + b_conv1)
     h_pool1 = max_pool_1x4(h_conv1)
-    
+
     W_conv2 = weight_variable([1, 25, 32, 64])
     b_conv2 = bias_variable([64])
     h_conv2 = tf.nn.relu(conv2d(h_pool1, W_conv2) + b_conv2)
     h_pool2 = max_pool_1x4(h_conv2)
-    
+
     W_fc1 = weight_variable([1 * 62 * 64, 1024])
     b_fc1 = bias_variable([1024])
     h_pool2_flat = tf.reshape(h_pool2, [-1, 1 * 62 *64])
     h_fc1 = tf.nn.relu(tf.matmul(h_pool2_flat, W_fc1) + b_fc1)
-    
+
     keep_prob = tf.placeholder(tf.float32)
     h_fc1_drop = tf.nn.dropout(h_fc1, keep_prob)
-    
+
     W_fc2 = weight_variable([1024, 14])
     b_fc2 = bias_variable([14])
     y_conv = tf.nn.softmax(tf.matmul(h_fc1_drop, W_fc2) + b_fc2)
@@ -539,7 +539,7 @@ def train_CNN(num_sample, num_batch, sample_id, x_data, dna_id, y_label, k_test_
     cross_entropy = tf.reduce_mean(-tf.reduce_sum(y_ * tf.log(y_conv_reg), reduction_indices=[1]))
     train_step = tf.train.GradientDescentOptimizer(1).minimize(cross_entropy)
     print "Building CNN is done..."
-  
+
   # Launch the graph
   training_threshold = 0.3
   testing_threshold = 0.06
@@ -640,7 +640,7 @@ def random_forest(x_data, y_label, k_test_set):
     #    r = clf.score(feature_test[index_set], target_test[index_set])
     #    results = results + ', '+str(number_class)+' = '+ str(r)
     results = results+'\r'
-    print results 
+    print results
     print '---------------------------------end-----------------------------------'
 
 if __name__ == "__main__":
